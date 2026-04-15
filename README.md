@@ -1,14 +1,42 @@
-# Manchu Degradation Simulator
+﻿# Manchu Degradation Simulator
 
-用于生成满文古籍图像退化样本的轻量代码仓库，方便单独复用、演示和后续扩展。
+A lightweight repository for simulating degradation effects on Manchu document images.
 
-这个仓库从原始项目中整理出“退化模拟”相关核心代码，聚焦以下能力：
+This project was extracted from a larger Manchu OCR and restoration system. It focuses on one reusable part of that work: generating synthetic degradation samples for ancient document research, restoration experiments, and demo data preparation.
 
-- 纸张背景与文字前景融合
-- 基础图像退化：模糊、JPEG 压缩、亮度对比变化
-- 文本区域退化：文字缺损、椒盐式掉墨
-- 高级文字损伤：不规则遮挡、墨迹式破坏
-- 小样本数据集抽样脚本
+## Project Background
+
+This repository comes from our broader work on Manchu ancient document recognition and restoration. During that project, we built a separate degradation simulation pipeline to synthesize damaged document samples for data generation, visual demos, and restoration-model training preparation.
+
+## What It Includes
+
+- Background and foreground fusion for clean Manchu text images
+- Basic image degradation effects
+  - Gaussian blur
+  - JPEG artifacts
+  - brightness / contrast perturbation
+- Text-aware degradation effects
+  - missing-style text dropout
+  - irregular broken-text damage with procedural masks
+- A small dataset sampling script for building lightweight subsets
+
+## Example Effects
+
+Clean input:
+
+![Clean Example](examples/clean.png)
+
+Missing-style text degradation (`miss`-like effect):
+
+![Miss Example](examples/pepper_text_dropout.png)
+
+Irregular damage / broken text effect:
+
+![Broken Text Example](examples/advanced_text_damage.png)
+
+Fused paper-text example:
+
+![Fused Example](examples/fused.png)
 
 ## Repository Structure
 
@@ -20,15 +48,17 @@
 │  ├─ text_degradations.py
 │  ├─ advanced_text_damage.py
 │  └─ advanced_degradations.py
+├─ examples/
 ├─ run_demo.py
 ├─ sample_manchu_dataset.py
 ├─ requirements.txt
+├─ LICENSE
 └─ README.md
 ```
 
 ## Environment
 
-建议使用 Python 3.10+
+Recommended: Python 3.10+
 
 ```bash
 pip install -r requirements.txt
@@ -36,12 +66,12 @@ pip install -r requirements.txt
 
 ## Quick Start
 
-准备两张图片：
+Prepare:
 
-- 一张干净的满文文字图
-- 一张纸张或古籍背景纹理图
+- one clean Manchu text image
+- one paper/background texture image
 
-运行：
+Run:
 
 ```bash
 python run_demo.py \
@@ -50,7 +80,7 @@ python run_demo.py \
   --output demo_output
 ```
 
-输出目录中会生成：
+The script will generate:
 
 - `clean.png`
 - `background.png`
@@ -61,18 +91,11 @@ python run_demo.py \
 - `pepper_text_dropout.png`
 - `advanced_text_damage.png`
 
-仓库内也附带了少量静态示例图，位于 `examples/`：
-
-- `examples/clean.png`
-- `examples/fused.png`
-- `examples/pepper_text_dropout.png`
-- `examples/advanced_text_damage.png`
-
 ## Core Modules
 
 ### `src/degradation_functions.py`
 
-基础图像层退化函数：
+Basic image-level degradation utilities:
 
 - Gaussian blur
 - JPEG artifacts
@@ -80,25 +103,25 @@ python run_demo.py \
 
 ### `src/text_degradations.py`
 
-针对文本区域的退化逻辑：
+Text-region degradation utilities:
 
-- 从干净图中提取文本 mask
-- 对文字区域做随机掉墨
+- extract text masks from clean images
+- apply dropout-like pepper damage to text regions
 
 ### `src/advanced_text_damage.py`
 
-更复杂的不规则文字损伤模拟：
+Procedural text damage generation:
 
-- 基于 OpenSimplex 生成破损 mask
-- 按文字 mask 与背景 patch 进行局部替换
+- generate irregular masks with OpenSimplex noise
+- apply background replacement inside text regions
 
 ### `src/advanced_degradations.py`
 
-补充型高级退化逻辑，包含更复杂的局部纸张损坏与文字损坏实现。
+Additional advanced degradation logic for more complex local damage patterns.
 
 ## Dataset Sampling
 
-如果你已经有完整的 `manchu_dataset`，可以用下面的脚本快速抽一个小数据集：
+If you already have a full `manchu_dataset`, you can create a smaller subset with:
 
 ```bash
 python sample_manchu_dataset.py \
@@ -111,13 +134,14 @@ python sample_manchu_dataset.py \
 
 ## Notes
 
-- 当前仓库保留的是“退化模拟核心代码”，没有打包 OCR、训练或大体量实验输出。
-- 原始代码里部分注释是历史编码产物，这不影响运行；后续如果要长期维护，建议逐步统一为 UTF-8 中文或英文注释。
-- `advanced_text_damage.py` 与 `advanced_degradations.py` 依赖 `opensimplex` 和 `perlin-noise`。
+- This repository contains the degradation simulation core only.
+- OCR, model training, and large experimental outputs are intentionally excluded.
+- Some original source comments came from legacy files with encoding issues. The code is still runnable, but future cleanup is recommended if this repo will be maintained long-term.
+- `advanced_text_damage.py` and `advanced_degradations.py` require `opensimplex` and `perlin-noise`.
 
 ## Suggested Next Steps
 
-- 将各类退化封装成统一 CLI
-- 增加配置文件驱动的批量生成入口
-- 补充少量可公开示例图
-- 为每种退化输出配套 mask，方便后续训练修复模型
+- wrap all degradations into a unified CLI
+- add config-driven batch generation
+- expose optional degradation masks for restoration training
+- add a few more public demo samples for each degradation type
